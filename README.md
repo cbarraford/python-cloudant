@@ -8,4 +8,6 @@ Goal
 
 I'm writing this as a means to teach myself the cloudant product. I feel its a good way to learn the service is writing an easy to use wrapper for it.
 
-
+Requirements
+============
+[requests](http://docs.python-requests.org/en/latest/index.html)
