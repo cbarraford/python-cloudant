@@ -1,9 +1,11 @@
 # coding=utf-8
 
 import requests
+import urllib
 import json
 import types
-import re
+import re, os
+import mimetypes
 
 class Cloudant():
     '''
@@ -176,13 +178,38 @@ class Cloudant():
         else:
             return False
 
-    def all_docs(self, name = None):
+    def all_docs(self, name = None, limit = 0, skip = 0):
         '''
         Get all documents in a database
         '''
+        params = {}
+        if limit > 0: params['limit'] = limit
+        if skip > 0: params['skip'] = skip
         if name == None: name = self.db
         if name != None:
-            return self.get('/%s/_all_docs' % name)
+            return self.get('/%s/_all_docs' % name, params=params)
         else:
             return False
 
+    def upload_file(self, key, content_type, the_file):
+        '''
+        Upload a file to the database FIXME: needs lots of work
+        '''
+        f = open(the_file, 'rb')
+        fname = os.path.basename(the_file)
+        data ={}
+        data['_id'] = key
+        tmp = {'content_type': 'image/png', 'data': f.read()}
+        data['_attachments'] = { fname: tmp }
+        url = 'https://%s.cloudant.com/%s' % (self.username, self.db)
+        print url
+        print data
+        auth = (self.authname,self.authpasswd)
+        headers = {'content-type': 'application/json'}
+        r = requests.post(url, auth=auth, headers=headers, data=data)
+        d = r.json()
+        if "error" in d: print "Error: %s" % d['reason']
+        r.raise_for_status()
+        return d
+
+    

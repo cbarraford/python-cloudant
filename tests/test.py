@@ -49,7 +49,7 @@ class TestCloudant(unittest.TestCase):
         assert self.testinsert == s
 
     def test_5_all_docs(self):
-        t = self.c.all_docs()
+        t = self.c.all_docs(self.db, {'limit':1})
         assert "rows" in t
         assert "total_rows" in t
         assert "offset" in t
@@ -62,6 +62,11 @@ class TestCloudant(unittest.TestCase):
         d = r.json()
         assert d['error'] == "not_found"
         assert d['reason'] == "deleted"
+
+#    def test_7_insert_attachment(self):
+#        r = self.c.upload_file('file', "image/png", "tests/cloudant.png")
+#        print r
+#        assert r['ok'] == True
 
     def test_zLast_deleteDB(self):
         t = self.c.deleteDB(self.db)
