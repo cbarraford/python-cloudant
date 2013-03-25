@@ -5,7 +5,7 @@ python:
 - '2.7'
 - '2.6'
 - '2.3'
-install: pip install -r requests --use-mirrors
+install: pip install -r requests
 script: python tests/test.py -v
 env:
   global:
