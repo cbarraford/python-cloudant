@@ -6,8 +6,6 @@ import types
 import os, sys
 import requests
 
-print "foo"
-
 # add classes location to sys.path
 cmd_folder = os.path.dirname(os.path.dirname((os.path.abspath(__file__))))
 if (cmd_folder + "/cloudant") not in sys.path:

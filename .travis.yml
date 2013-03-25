@@ -1,9 +1,20 @@
+---
 language: python
 python:
-  - "3.3"
-  - "2.7"
-  - "2.6"
-# command to install dependencies, e.g. pip install -r requirements.txt --use-mirrors
+- '3.3'
+- '2.7'
+- '2.6'
 install: pip install -r requests --use-mirrors
-# command to run tests, e.g. python setup.py test
-script: python cloudant/cloudant.py -v
+script: python tests/test.py -v
+env:
+  global:
+  - secure: ! 'cLLrnQONenSY4ar7QWk/EC53Aa7nalBWrRpwdLi/P7W5MoTLQKC5Cn0F4AyW
+
+      n/2x+yjgV4vk8iWnWZfuJj7RON8U1Y+9rAH1e/+5R145ZXqIDbUatriYS7Mr
+
+      1+yzdGJLAIsaPDLJ38iRVLARcco3bQsDMu3NC2lL+ibP3iGfxxs='
+  - secure: ! 'G8oN0L3MiIEEdsJIf9qfr/PPK+xZ+NLnE50VtITXxhBZbdXN89CvYW5zBkM2
+
+      l8JZ2C+2ybY4DCUwM1u3jwFgpGd8IgiDYT3k4f8sIgmQSefKoapoL8fGRLno
+
+      zL7jEKAUfElP2IYCSz7Qp1JIBtJCtLmKeC6QsmwN0rIzZvvaY8c='
