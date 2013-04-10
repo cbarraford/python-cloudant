@@ -19,7 +19,9 @@ class Cloudant():
         self.authname = authname
         self.authpasswd = authpasswd
         '''
-        When authenicating with a username and password, authname becomes the username (which is used in the base url). But when authenicating with api credentials, you must specify a username.
+        When authenicating with a username and password, authname becomes the 
+        username (which is used in the base url). But when authenicating with 
+        api credentials, you must specify a username.
         '''
         if username == None:
             self.username = authname
@@ -36,24 +38,34 @@ class Cloudant():
         headers = {'content-type': 'application/json'}
 
         if calltype == "GET":
+            print url
             r = requests.get(url, auth=auth)
         elif calltype == "POST":
             if d['data'] != None:
-                r = requests.post(url, auth=auth, headers=headers, data=json.dumps(d['data']))
+                r = requests.post(url, \
+                                  auth=auth, \
+                                  headers=headers, \
+                                  data=json.dumps(d['data']))
             else:
                 r = requests.post(url, auth=auth)
         elif calltype == "PUT":
             if d['data'] != None:
-                r = requests.put(url, auth=auth, headers=headers, data=json.dumps(d['data']))
+                r = requests.put(url, \
+                                 auth=auth, \
+                                 headers=headers, \
+                                 data=json.dumps(d['data']))
             else:
                 r = requests.put(url, auth=auth)
         elif calltype == "DELETE":
             if d['data'] != None:
-                r = requests.delete(url, auth=auth, headers=headers, data=json.dumps(d['data']))
+                r = requests.delete(url, \
+                                    auth=auth, \
+                                    headers=headers, \
+                                    data=json.dumps(d['data']))
             else:
                 r = requests.delete(url, auth=auth)
         elif calltype == "HEAD":
-                r = requests.head(url, auth=auth)
+            r = requests.head(url, auth=auth)
         if calltype == "HEAD":
             d = r.headers
         else:
@@ -92,30 +104,31 @@ class Cloudant():
         '''
         return self.httpcall( { 'url': url }, "HEAD")
 
-    def hasDB(self):
+    def has_db(self):
         '''
         Tests to see if self has a db value
         '''
         if self.db == None:
-            raise RuntimeError("This Cloudant object doesn't have a database name set")
+            e = "This Cloudant object doesn't have a database name set"
+            raise RuntimeError(e)
             return False
         else:
             return True
 
-    def getVersion(self):
+    def get_version(self):
         '''
         Get Cloudant version/build
         '''
         r = self.get()
         return { 'version': r['version'], 'build': r['cloudant_build'] }
 
-    def listDBs(self):
+    def list_dbs(self):
         '''
         Get list of databases
         '''
         return self.get('/_all_dbs')
 
-    def createDB(self, name = None):
+    def create_db(self, name = None):
         '''
         Create a new database
         '''
@@ -126,7 +139,7 @@ class Cloudant():
         else:
             return False
 
-    def deleteDB(self, name = None):
+    def delete_db(self, name = None):
         '''
         Delete a database
         '''
@@ -141,7 +154,7 @@ class Cloudant():
         '''
         Insert a document into the database
         '''
-        if self.hasDB:
+        if self.has_db:
             if isinstance(data, types.ListType):
                 # is list, therefore, is bulk insert
                 data = { 'docs': data }
@@ -160,7 +173,7 @@ class Cloudant():
         '''
         Read a doc from the db via key
         '''
-        if self.hasDB:
+        if self.has_db:
             return self.get('/%s/%s' % (self.db, key))
         else:
             return False
@@ -170,7 +183,7 @@ class Cloudant():
         Delete a doc from the db via key & doc
         If a rev is not specified, one is found and used
         '''
-        if self.hasDB:
+        if self.has_db:
             if rev == None:
                 r = self.head('/%s/%s' % (self.db, key))
                 rev = re.sub('"', '', r['etag'])
@@ -178,32 +191,28 @@ class Cloudant():
         else:
             return False
 
-    def all_docs(self, name = None, limit = 0, skip = 0):
+    def all_docs(self, name = None, params = {}):
         '''
         Get all documents in a database
+        For a list of acceptable parameters, see https://cloudant.com/for-developers/all_docs/
         '''
-        params = {}
-        if limit > 0: params['limit'] = limit
-        if skip > 0: params['skip'] = skip
         if name == None: name = self.db
         if name != None:
-            return self.get('/%s/_all_docs' % name, params=params)
+            return self.get('/%s/_all_docs?%s' % ( name, urllib.urlencode(params) ))
         else:
             return False
 
     def upload_file(self, key, content_type, the_file):
         '''
-        Upload a file to the database FIXME: needs lots of work
+        Upload a file to the database FIXME: needs lots of work (NON-FUNCTIONAL)
         '''
         f = open(the_file, 'rb')
         fname = os.path.basename(the_file)
-        data ={}
+        data = {}
         data['_id'] = key
         tmp = {'content_type': 'image/png', 'data': f.read()}
         data['_attachments'] = { fname: tmp }
         url = 'https://%s.cloudant.com/%s' % (self.username, self.db)
-        print url
-        print data
         auth = (self.authname,self.authpasswd)
         headers = {'content-type': 'application/json'}
         r = requests.post(url, auth=auth, headers=headers, data=data)
@@ -212,4 +221,51 @@ class Cloudant():
         r.raise_for_status()
         return d
 
-    
+    def get_secondary_indexes(self):
+        '''
+        Returns all design docs and their content
+        '''
+        if self.has_db:
+            docs = self.all_docs( params = { 'startkey': '"_design"', "endkey": '"_design0"', 'include_docs': 'true' } )
+            if docs['rows']:
+                for i in docs['rows']:
+                   pass 
+            else:
+                return False
+        else:
+            return False
+
+class Secondary_Index():
+    '''
+    A Class for secondary indexes
+    '''    
+    def __init__(self, data):
+        '''
+        Initalize a secondary index
+        '''
+        _id = data['_id']
+        _rev = data['_rev']
+        indexes = data['indexes']
+        views = data['views']
+
+    def save(self, name):
+        '''
+        Save a secondary view
+        '''
+        if name == None: name = self.db
+        if name != None:
+            return self.put('/%s' % ( self._id, name ))
+        else:
+            return False
+
+    def get(self, name, params = {}):
+        '''
+        Get results of a secondary index
+        '''
+        if name == None: name = self.db
+        if name != None:
+            return self.get('/%s/_view/%s?%s' % ( self._id, name, urllib.urlencode(params) ))
+        else:
+            return False
+
+

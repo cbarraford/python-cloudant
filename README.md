@@ -16,6 +16,6 @@ Tests
 =====
 python-cloudant is written in a test-driven development mentality. All methods and code must have an associated test written for it. To run these tests, execute
 ```
-    python test.py -v
+    python tests/test.py -v
 ```
 Travis CI is used to run tests on all push and pull requests.

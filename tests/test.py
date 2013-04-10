@@ -25,20 +25,20 @@ class TestCloudant(unittest.TestCase):
         self.testinsert = { "season": "summer", "weather": "usually warm and sunny" }
         self.c = c.Cloudant(self.username, self.password, self.username, self.db)
 
-    def test_1_getVersion(self):
-        self.version = self.c.getVersion()
+    def test_1_get_version(self):
+        self.version = self.c.get_version()
         assert isinstance(self.version, types.DictType)
         assert len(self.version['version']) > 0
         assert len(self.version['build']) > 0
 
-    def test_2_listDBs(self):
-        self.dbs = self.c.listDBs()
+    def test_2_list_dbs(self):
+        self.dbs = self.c.list_dbs()
         assert isinstance(self.dbs, types.ListType)
 
-    def test_3_createDB(self):
-        t = self.c.createDB(self.db)
+    def test_3_create_db(self):
+        t = self.c.create_db(self.db)
         assert t == True
-        assert self.db in self.c.listDBs()
+        assert self.db in self.c.list_dbs()
 
     def test_4_insert(self):
         t = self.c.insert(self.testinsert)
@@ -68,10 +68,18 @@ class TestCloudant(unittest.TestCase):
 #        print r
 #        assert r['ok'] == True
 
-    def test_zLast_deleteDB(self):
-        t = self.c.deleteDB(self.db)
+    def test_8_list_design_docs(self):
+        view_docs = self.c.listDesignDocs()
+        assert isinstance(view_docs['rows'], types.ListType)
+
+    def test_9_get_design_docs(self):
+        views = self.c.getDesignDocs()
+        assert isinstance(views['rows'], types.ListType)
+
+    def test_zLast_delete_db(self):
+        t = self.c.delete_db(self.db)
         assert t == True
-        assert self.db not in self.c.listDBs()
+        assert self.db not in self.c.list_dbs()
 
 if __name__ == '__main__':
     unittest.main()
